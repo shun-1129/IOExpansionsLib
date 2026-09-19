@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+        <!-- 出力先フォルダのパス（相対パスまたは絶対パス） -->
+        <OutputPath>$(SYSoft)\$(MSBuildProjectName)\</OutputPath>
+
+        <!-- フレームワーク名（net8.0など）のサブフォルダ生成を防ぐ場合（任意） -->
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <!-- ランタイムID（win-x64など）のサブフォルダ生成を防ぐ場合（任意） -->
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    </PropertyGroup>
+
+    <Target Name="ValidateEnvironmentVariable" BeforeTargets="Build">
+        <Error Condition="'$(SYSoft)' == ''" Text="環境変数 SYSoft が設定されていません。" />
+    </Target>
+
+</Project>
