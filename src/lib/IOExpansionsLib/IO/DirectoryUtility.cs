@@ -133,7 +133,7 @@ namespace IOExpansionsLib.IO
         /// </summary>
         /// <param name="sourceDirectory">移動するディレクトリの情報</param>
         /// <param name="destinationPath">移動先のパス</param>
-        public static void MoveDirectory ( DirectoryEntityInfo sourceDirectory , string destinationPath )
+        public static void Move ( DirectoryEntityInfo sourceDirectory , string destinationPath )
         {
             if ( !Directory.Exists ( sourceDirectory.DirectoryPath ) )
             {
@@ -143,6 +143,11 @@ namespace IOExpansionsLib.IO
             if ( !Directory.Exists ( destinationPath ) )
             {
                 throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
+            }
+
+            if ( !IsValidName ( sourceDirectory.DirectoryName ) )
+            {
+                throw new ArgumentException ( $"Invalid directory name '{sourceDirectory.DirectoryName}'." );
             }
 
             string destinationDirectoryPath = Path.Combine ( destinationPath , sourceDirectory.DirectoryName );
@@ -161,7 +166,7 @@ namespace IOExpansionsLib.IO
         /// <param name="sourceDirectory">移動するディレクトリの情報</param>
         /// <param name="destinationPath">移動先のパス</param>
         /// <returns>操作結果</returns>
-        public static void MoveDirectoryWithTimestampIfExists ( DirectoryEntityInfo sourceDirectory , string destinationPath )
+        public static void MoveWithTimestampIfExists ( DirectoryEntityInfo sourceDirectory , string destinationPath )
         {
             if ( !Directory.Exists ( sourceDirectory.DirectoryPath ) )
             {
@@ -171,6 +176,11 @@ namespace IOExpansionsLib.IO
             if ( !Directory.Exists ( destinationPath ) )
             {
                 throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
+            }
+
+            if ( !IsValidName ( sourceDirectory.DirectoryName ) )
+            {
+                throw new ArgumentException ( $"Invalid directory name '{sourceDirectory.DirectoryName}'." );
             }
 
             string destinationDirectoryPath = Path.Combine ( destinationPath , sourceDirectory.DirectoryName );
@@ -186,6 +196,123 @@ namespace IOExpansionsLib.IO
             string newDirectoryName = $"{sourceDirectory.DirectoryName}_{timestamp}";
             string newDestinationDirectoryPath = Path.Combine ( destinationPath , newDirectoryName );
             Directory.Move ( sourceDirectory.DirectoryPath , newDestinationDirectoryPath );
+        }
+        #endregion
+
+        #region ディレクトリコピー
+        /// <summary>
+        /// ディレクトリをコピーする
+        /// </summary>
+        /// <param name="sourceDirectory">コピー元のディレクトリ情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        /// <exception cref="DirectoryNotFoundException">ディレクトリが存在しない場合にスローされます</exception>
+        /// <exception cref="ArgumentException">無効なディレクトリ名の場合にスローされます</exception>
+        /// <exception cref="IOException">コピー先のディレクトリが既に存在する場合にスローされます</exception>
+        public static void Copy ( DirectoryEntityInfo sourceDirectory , string destinationPath )
+        {
+            if ( !Directory.Exists ( sourceDirectory.DirectoryPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Source directory '{sourceDirectory.DirectoryPath}' does not exist." );
+            }
+
+            if ( !Directory.Exists ( destinationPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
+            }
+
+            if ( !IsValidName ( sourceDirectory.DirectoryName ) )
+            {
+                throw new ArgumentException ( $"Invalid directory name '{sourceDirectory.DirectoryName}'." );
+            }
+
+            string destinationDirectoryPath = Path.Combine ( destinationPath , sourceDirectory.DirectoryName );
+            if ( Directory.Exists ( destinationDirectoryPath ) )
+            {
+                throw new IOException ( $"Destination directory '{destinationDirectoryPath}' already exists." );
+            }
+
+            CopyDirectoryRecursively ( sourceDirectory , destinationDirectoryPath );
+        }
+
+        /// <summary>
+        /// ディレクトリをコピーする（既存のディレクトリが存在する場合はタイムスタンプを付加してコピー）
+        /// </summary>
+        /// <param name="sourceDirectory">コピー元のディレクトリ情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        /// <exception cref="DirectoryNotFoundException">ディレクトリが存在しない場合にスローされます</exception>
+        /// <exception cref="ArgumentException">無効なディレクトリ名の場合にスローされます</exception>
+        public static void CopyWithTimestampIfExists ( DirectoryEntityInfo sourceDirectory , string destinationPath )
+        {
+            if ( !Directory.Exists ( sourceDirectory.DirectoryPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Source directory '{sourceDirectory.DirectoryPath}' does not exist." );
+            }
+
+            if ( !Directory.Exists ( destinationPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
+            }
+
+            if ( !IsValidName ( sourceDirectory.DirectoryName ) )
+            {
+                throw new ArgumentException ( $"Invalid directory name '{sourceDirectory.DirectoryName}'." );
+            }
+
+            string destinationDirectoryPath = Path.Combine ( destinationPath , sourceDirectory.DirectoryName );
+            if ( !Directory.Exists ( destinationDirectoryPath ) )
+            {
+                CopyDirectoryRecursively ( sourceDirectory , destinationDirectoryPath );
+                return;
+            }
+
+            // ディレクトリが存在する場合、タイムスタンプを付加してコピー
+            string timestamp = DateTime.Now.ToString ( "yyyyMMddHHmmssfff" );
+            string newDirectoryName = $"{sourceDirectory.DirectoryName}_{timestamp}";
+            string newDestinationDirectoryPath = Path.Combine ( destinationPath , newDirectoryName );
+            CopyDirectoryRecursively ( sourceDirectory , newDestinationDirectoryPath );
+        }
+
+        /// <summary>
+        /// 再帰的にディレクトリをコピーする
+        /// </summary>
+        /// <param name="sourceDirectoryEntityInfo">コピー元のディレクトリ情報</param>
+        /// <param name="destinationDir">コピー先のディレクトリパス</param>
+        private static void CopyDirectoryRecursively ( DirectoryEntityInfo sourceDirectoryEntityInfo , string destinationDir )
+        {
+            Directory.CreateDirectory ( destinationDir );
+
+            IEnumerable<FileEntityInfo> files = FileUtility.GetFiles ( sourceDirectoryEntityInfo.DirectoryPath , SearchOption.TopDirectoryOnly );
+
+            // コピー元ディレクトリ内のファイルをコピー
+            foreach ( FileEntityInfo file in files )
+            {
+                FileUtility.Copy ( file , destinationDir );
+            }
+
+            IEnumerable<DirectoryEntityInfo> subDirectories = GetDirectories ( sourceDirectoryEntityInfo.DirectoryPath , SearchOption.TopDirectoryOnly );
+            foreach ( DirectoryEntityInfo subDirectory in subDirectories )
+            {
+                string subDestinationDir = Path.Combine ( destinationDir , subDirectory.DirectoryName );
+                CopyDirectoryRecursively ( subDirectory , subDestinationDir );
+            }
+        }
+        #endregion
+
+        #region ディレクトリ削除
+        /// <summary>
+        /// ディレクトリを削除する
+        /// </summary>
+        /// <param name="directory">削除するディレクトリ情報</param>
+        /// <param name="recursive">サブディレクトリも再帰的に削除するかどうか</param>
+        /// <exception cref="DirectoryNotFoundException">ディレクトリが存在しない場合にスローされます</exception>
+        public static void Delete ( DirectoryEntityInfo directory , bool recursive = false )
+        {
+            if ( !Directory.Exists ( directory.DirectoryPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Directory '{directory.DirectoryPath}' does not exist." );
+            }
+
+            Directory.Delete ( directory.DirectoryPath , recursive );
         }
         #endregion
     }

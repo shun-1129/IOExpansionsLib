@@ -14,7 +14,7 @@
         {
             return path.Split (
                 new[] {
-                    Path.DirectorySeparatorChar , 
+                    Path.DirectorySeparatorChar ,
                     Path.AltDirectorySeparatorChar } ,
                 StringSplitOptions.RemoveEmptyEntries ).Length;
         }
@@ -25,5 +25,35 @@
         /// <param name="searchPattern">検索パターン</param>
         /// <returns>正規化された検索パターン</returns>
         public static string NormalizeSearchPattern ( string searchPattern ) => string.IsNullOrEmpty ( searchPattern ) ? "*" : searchPattern;
+
+        /// <summary>
+        /// 名称が有効かどうかを判定する
+        /// </summary>
+        /// <param name="name">判定する名称</param>
+        /// <returns>
+        /// 有効な名称：<see langword="true"/><br/>
+        /// 無効な名称：<see langword="false"/>
+        /// </returns>
+        internal static bool IsValidName ( string name )
+        {
+            if ( string.IsNullOrWhiteSpace ( name ) )
+            {
+                return false;
+            }
+
+            char[] invalidChars = Path.GetInvalidFileNameChars ();
+
+            if ( name.Any ( invalidChars.Contains ) )
+            {
+                return false;
+            }
+
+            if ( name.EndsWith ( '.' ) || name.EndsWith ( ' ' ) )
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

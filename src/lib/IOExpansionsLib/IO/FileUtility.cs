@@ -139,26 +139,16 @@ namespace IOExpansionsLib.IO
         /// </summary>
         /// <remarks>
         /// ファイルが存在する場合は上書きされず、移動は失敗します。<br/>
-        /// 上書きを許可する場合は、MoveFile(FileEntityInfo sourceFile, string destinationPath, bool isOverwrite) メソッドを使用してください。
-        /// </remarks>
-        /// <param name="sourceFile">移動するファイルの情報</param>
-        /// <param name="destinationPath">移動先のディレクトリパス</param>
-        public static void MoveFile ( FileEntityInfo sourceFile , string destinationPath )
-        {
-            MoveFile ( sourceFile , destinationPath , false );
-        }
-
-        /// <summary>
-        /// ファイルを移動する
-        /// </summary>
-        /// <remarks>
-        /// ファイルが存在する場合は上書きされず、移動は失敗します。<br/>
         /// 上書きを許可する場合は、isOverwrite パラメータを true に設定してください。
         /// </remarks>
         /// <param name="sourceFile">移動するファイルの情報</param>
         /// <param name="destinationPath">移動先のディレクトリパス</param>
         /// <param name="isOverwrite">既存のファイルを上書きするかどうか</param>
-        public static void MoveFile ( FileEntityInfo sourceFile , string destinationPath , bool isOverwrite )
+        /// <exception cref="FileNotFoundException">コピー元のファイルが存在しない場合にスローされます。</exception>
+        /// <exception cref="DirectoryNotFoundException">コピー先のディレクトリが存在しない場合にスローされます。</exception>
+        /// <exception cref="ArgumentException">無効なファイル名の場合にスローされます。</exception>
+        /// <exception cref="IOException">コピー先のファイルが既に存在する場合にスローされます。</exception>
+        public static void Move ( FileEntityInfo sourceFile , string destinationPath , bool isOverwrite = false )
         {
             if ( !File.Exists ( sourceFile.FilePath ) )
             {
@@ -170,7 +160,18 @@ namespace IOExpansionsLib.IO
                 throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
             }
 
+            if ( !IsValidName ( sourceFile.FileName ) )
+            {
+                throw new ArgumentException ( $"Invalid file name '{sourceFile.FileName}'." );
+            }
+
             string destinationFilePath = Path.Combine ( destinationPath , sourceFile.FileName );
+
+            if ( File.Exists ( destinationFilePath ) && !isOverwrite )
+            {
+                throw new IOException ( $"Destination file '{destinationFilePath}' already exists." );
+            }
+
             File.Move ( sourceFile.FilePath , destinationFilePath , isOverwrite );
         }
 
@@ -179,7 +180,10 @@ namespace IOExpansionsLib.IO
         /// </summary>
         /// <param name="sourceFile">移動するファイルの情報</param>
         /// <param name="destinationPath">移動先のディレクトリパス</param>
-        public static void MoveFileWithTimestampIfExists ( FileEntityInfo sourceFile , string destinationPath )
+        /// <exception cref="FileNotFoundException">コピー元のファイルが存在しない場合にスローされます。</exception>
+        /// <exception cref="DirectoryNotFoundException">コピー先のディレクトリが存在しない場合にスローされます。</exception>
+        /// <exception cref="ArgumentException">無効なファイル名の場合にスローされます。</exception>
+        public static void MoveWithTimestampIfExists ( FileEntityInfo sourceFile , string destinationPath )
         {
             if ( !File.Exists ( sourceFile.FilePath ) )
             {
@@ -192,6 +196,11 @@ namespace IOExpansionsLib.IO
             }
 
             string destinationFilePath = Path.Combine ( destinationPath , sourceFile.FileName );
+
+            if ( !IsValidName ( sourceFile.FileName ) )
+            {
+                throw new ArgumentException ( $"Invalid file name '{sourceFile.FileName}'." );
+            }
 
             if ( !File.Exists ( destinationFilePath ) )
             {
@@ -205,6 +214,102 @@ namespace IOExpansionsLib.IO
             string newDestinationFilePath = Path.Combine ( destinationPath , newFileName );
 
             File.Move ( sourceFile.FilePath , newDestinationFilePath );
+        }
+        #endregion
+
+        #region ファイルコピー
+        /// <summary>
+        /// ファイルをコピーする
+        /// </summary>
+        /// <param name="sourceFile">コピーするファイルの情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        /// <param name="isOverwrite">既存のファイルを上書きするかどうか</param>
+        /// <exception cref="FileNotFoundException">コピー元のファイルが存在しない場合にスローされます。</exception>
+        /// <exception cref="DirectoryNotFoundException">コピー先のディレクトリが存在しない場合にスローされます。</exception>
+        /// <exception cref="ArgumentException">無効なファイル名の場合にスローされます。</exception>
+        /// <exception cref="IOException">コピー先のファイルが既に存在する場合にスローされます。</exception>
+        public static void Copy ( FileEntityInfo sourceFile , string destinationPath , bool isOverwrite = false )
+        {
+            if ( !File.Exists ( sourceFile.FilePath ) )
+            {
+                throw new FileNotFoundException ( $"Source file '{sourceFile.FilePath}' does not exist." );
+            }
+
+            if ( !Directory.Exists ( destinationPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
+            }
+
+            if ( !IsValidName ( sourceFile.FileName ) )
+            {
+                throw new ArgumentException ( $"Invalid file name '{sourceFile.FileName}'." );
+            }
+
+            string destinationFilePath = Path.Combine ( destinationPath , sourceFile.FileName );
+
+            if ( File.Exists ( destinationFilePath ) && !isOverwrite )
+            {
+                throw new IOException ( $"Destination file '{destinationFilePath}' already exists." );
+            }
+
+            File.Copy ( sourceFile.FilePath , destinationFilePath , isOverwrite );
+        }
+
+        /// <summary>
+        /// ファイルをコピーする（既存のファイルが存在する場合はタイムスタンプを付加してコピー）
+        /// </summary>
+        /// <param name="sourceFile">コピーするファイルの情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        /// <exception cref="FileNotFoundException">コピー元のファイルが存在しない場合にスローされます。</exception>
+        /// <exception cref="DirectoryNotFoundException">コピー先のディレクトリが存在しない場合にスローされます。</exception>
+        /// <exception cref="ArgumentException">無効なファイル名の場合にスローされます。</exception>
+        public static void CopyWithTimestampIfExists ( FileEntityInfo sourceFile , string destinationPath )
+        {
+            if ( !File.Exists ( sourceFile.FilePath ) )
+            {
+                throw new FileNotFoundException ( $"Source file '{sourceFile.FilePath}' does not exist." );
+            }
+
+            if ( !Directory.Exists ( destinationPath ) )
+            {
+                throw new DirectoryNotFoundException ( $"Destination directory '{destinationPath}' does not exist." );
+            }
+
+            string destinationFilePath = Path.Combine ( destinationPath , sourceFile.FileName );
+
+            if ( !IsValidName ( sourceFile.FileName ) )
+            {
+                throw new ArgumentException ( $"Invalid file name '{sourceFile.FileName}'." );
+            }
+
+            if ( !File.Exists ( destinationFilePath ) )
+            {
+                File.Copy ( sourceFile.FilePath , destinationFilePath );
+                return;
+            }
+
+            // ファイルが存在する場合、タイムスタンプを付加してコピー
+            string timestamp = DateTime.Now.ToString ( "yyyyMMddHHmmssfff" );
+            string newFileName = $"{sourceFile.FileNameWithoutExtension}_{timestamp}{sourceFile.FileExtension}";
+            string newDestinationFilePath = Path.Combine ( destinationPath , newFileName );
+            File.Copy ( sourceFile.FilePath , newDestinationFilePath );
+        }
+        #endregion
+
+        #region ファイル削除
+        /// <summary>
+        /// ファイルを削除する
+        /// </summary>
+        /// <param name="file">削除するファイルの情報</param>
+        /// <exception cref="FileNotFoundException">指定されたファイルが存在しない場合にスローされます。</exception>
+        public static void Delete ( FileEntityInfo file )
+        {
+            if ( !File.Exists ( file.FilePath ) )
+            {
+                throw new FileNotFoundException ( $"File '{file.FilePath}' does not exist." );
+            }
+
+            File.Delete ( file.FilePath );
         }
         #endregion
     }
