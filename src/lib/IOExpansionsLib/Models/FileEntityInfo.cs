@@ -28,7 +28,15 @@
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="filePath"></param>
+        public FileEntityInfo ()
+        {
+            FilePath = string.Empty;
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="filePath">ファイルパス</param>
         public FileEntityInfo ( string filePath )
         {
             FilePath = filePath;
