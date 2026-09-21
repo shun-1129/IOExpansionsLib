@@ -23,6 +23,14 @@
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        public DirectoryEntityInfo ()
+        {
+            DirectoryPath = string.Empty;
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         /// <param name="directoryPath">ディレクトリパス</param>
         public DirectoryEntityInfo ( string directoryPath )
         {

@@ -17,7 +17,22 @@ namespace IOExpansionsLib.IO
         /// <returns>ディレクトリのコレクション</returns>
         public static IEnumerable<DirectoryEntityInfo> GetDirectories ( string path )
         {
-            return Directory.GetDirectories ( path , "*" , SearchOption.TopDirectoryOnly ).Select ( dir => new DirectoryEntityInfo ( dir ) );
+            return Directory
+                .GetDirectories ( path , "*" , SearchOption.TopDirectoryOnly )
+                .Select ( dir => new DirectoryEntityInfo ( dir ) );
+        }
+
+        /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path ) where T : DirectoryEntityInfo , new ()
+        {
+            return Directory
+                .GetDirectories ( path , "*" , SearchOption.TopDirectoryOnly )
+                .Select ( dir => new T { DirectoryPath = dir } );
         }
 
         /// <summary>
@@ -29,6 +44,19 @@ namespace IOExpansionsLib.IO
         public static IEnumerable<DirectoryEntityInfo> GetDirectories ( string path , SortOrderPattern sortPattern = SortOrderPattern.None )
         {
             IEnumerable<DirectoryEntityInfo> directories = GetDirectories ( path );
+            return SortDirectories ( directories , sortPattern );
+        }
+
+        /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : DirectoryEntityInfo , new ()
+        {
+            IEnumerable<T> directories = GetDirectories<T> ( path );
             return SortDirectories ( directories , sortPattern );
         }
 
@@ -46,6 +74,20 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , string searchPattern ) where T : DirectoryEntityInfo , new ()
+        {
+            return Directory
+                .GetDirectories ( path , NormalizeSearchPattern ( searchPattern ) , SearchOption.TopDirectoryOnly )
+                .Select ( dir => new T { DirectoryPath = dir } );
+        }
+
+        /// <summary>
         /// ディレクトリを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -59,6 +101,20 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , string searchPattern , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : DirectoryEntityInfo , new ()
+        {
+            IEnumerable<T> directories = GetDirectories<T> ( path , searchPattern );
+            return SortDirectories ( directories , sortPattern );
+        }
+
+        /// <summary>
         /// ディレクトリを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -67,6 +123,18 @@ namespace IOExpansionsLib.IO
         public static IEnumerable<DirectoryEntityInfo> GetDirectories ( string path , SearchOption searchOption )
         {
             return Directory.GetDirectories ( path , "*" , searchOption ).Select ( dir => new DirectoryEntityInfo ( dir ) );
+        }
+
+        /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , SearchOption searchOption ) where T : DirectoryEntityInfo , new ()
+        {
+            return Directory.GetDirectories ( path , "*" , searchOption ).Select ( dir => new T { DirectoryPath = dir } );
         }
 
         /// <summary>
@@ -83,6 +151,20 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , SearchOption searchOption , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : DirectoryEntityInfo , new ()
+        {
+            IEnumerable<T> directories = GetDirectories<T> ( path , searchOption );
+            return SortDirectories ( directories , sortPattern );
+        }
+
+        /// <summary>
         /// ディレクトリを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -92,6 +174,19 @@ namespace IOExpansionsLib.IO
         public static IEnumerable<DirectoryEntityInfo> GetDirectories ( string path , string searchPattern , SearchOption searchOption )
         {
             return Directory.GetDirectories ( path , NormalizeSearchPattern ( searchPattern ) , searchOption ).Select ( dir => new DirectoryEntityInfo ( dir ) );
+        }
+
+        /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , string searchPattern , SearchOption searchOption ) where T : DirectoryEntityInfo , new ()
+        {
+            return Directory.GetDirectories ( path , NormalizeSearchPattern ( searchPattern ) , searchOption ).Select ( dir => new T { DirectoryPath = dir } );
         }
 
         /// <summary>
@@ -109,12 +204,27 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ディレクトリを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ディレクトリのコレクション</returns>
+        public static IEnumerable<T> GetDirectories<T> ( string path , string searchPattern , SearchOption searchOption , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : DirectoryEntityInfo , new ()
+        {
+            IEnumerable<T> directories = GetDirectories<T> ( path , searchPattern , searchOption );
+            return SortDirectories ( directories , sortPattern );
+        }
+
+        /// <summary>
         /// ディレクトリコレクションを並び替える
         /// </summary>
         /// <param name="directories">ディレクトリのコレクション</param>
         /// <param name="sortPattern">並び替えパターン</param>
         /// <returns>並び替え後のディレクトリコレクション</returns>
-        private static IEnumerable<DirectoryEntityInfo> SortDirectories ( IEnumerable<DirectoryEntityInfo> directories , SortOrderPattern sortPattern )
+        private static IEnumerable<T> SortDirectories<T> ( IEnumerable<T> directories , SortOrderPattern sortPattern ) where T : DirectoryEntityInfo , new ()
         {
             return sortPattern switch
             {
@@ -161,6 +271,18 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ディレクトリを移動する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="sourceDirectory">移動するディレクトリの情報</param>
+        /// <param name="destinationPath">移動先のパス</param>
+        public static void Move<T> ( T sourceDirectory , string destinationPath ) where T : DirectoryEntityInfo , new ()
+        {
+            DirectoryEntityInfo srcDir = new DirectoryEntityInfo ( sourceDirectory.DirectoryPath );
+            Move ( srcDir , destinationPath );
+        }
+
+        /// <summary>
         /// ディレクトリを移動する（既存のディレクトリが存在する場合はタイムスタンプを付加して移動）
         /// </summary>
         /// <param name="sourceDirectory">移動するディレクトリの情報</param>
@@ -196,6 +318,18 @@ namespace IOExpansionsLib.IO
             string newDirectoryName = $"{sourceDirectory.DirectoryName}_{timestamp}";
             string newDestinationDirectoryPath = Path.Combine ( destinationPath , newDirectoryName );
             Directory.Move ( sourceDirectory.DirectoryPath , newDestinationDirectoryPath );
+        }
+
+        /// <summary>
+        /// ディレクトリを移動する（既存のディレクトリが存在する場合はタイムスタンプを付加して移動、ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="sourceDirectory">移動するディレクトリの情報</param>
+        /// <param name="destinationPath">移動先のパス</param>
+        public static void MoveWithTimestampIfExists<T> ( T sourceDirectory , string destinationPath ) where T : DirectoryEntityInfo , new ()
+        {
+            DirectoryEntityInfo srcDir = new DirectoryEntityInfo ( sourceDirectory.DirectoryPath );
+            MoveWithTimestampIfExists ( srcDir , destinationPath );
         }
         #endregion
 
@@ -235,6 +369,18 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ディレクトリをコピーする（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="sourceDirectory">コピー元のディレクトリ情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        public static void Copy<T> ( T sourceDirectory , string destinationPath ) where T : DirectoryEntityInfo , new ()
+        {
+            DirectoryEntityInfo srcDir = new DirectoryEntityInfo ( sourceDirectory.DirectoryPath );
+            Copy ( srcDir , destinationPath );
+        }
+
+        /// <summary>
         /// ディレクトリをコピーする（既存のディレクトリが存在する場合はタイムスタンプを付加してコピー）
         /// </summary>
         /// <param name="sourceDirectory">コピー元のディレクトリ情報</param>
@@ -270,6 +416,18 @@ namespace IOExpansionsLib.IO
             string newDirectoryName = $"{sourceDirectory.DirectoryName}_{timestamp}";
             string newDestinationDirectoryPath = Path.Combine ( destinationPath , newDirectoryName );
             CopyDirectoryRecursively ( sourceDirectory , newDestinationDirectoryPath );
+        }
+
+        /// <summary>
+        /// ディレクトリをコピーする（既存のディレクトリが存在する場合はタイムスタンプを付加してコピー、ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="sourceDirectory">コピー元のディレクトリ情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        public static void CopyWithTimestampIfExists<T> ( T sourceDirectory , string destinationPath ) where T : DirectoryEntityInfo , new ()
+        {
+            DirectoryEntityInfo srcDir = new DirectoryEntityInfo ( sourceDirectory.DirectoryPath );
+            CopyWithTimestampIfExists ( srcDir , destinationPath );
         }
 
         /// <summary>
@@ -313,6 +471,45 @@ namespace IOExpansionsLib.IO
             }
 
             Directory.Delete ( directory.DirectoryPath , recursive );
+        }
+
+        /// <summary>
+        /// ディレクトリを削除する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="directory">削除するディレクトリ情報</param>
+        /// <param name="recursive">サブディレクトリも再帰的に削除するかどうか</param>
+        public static void Delete<T> ( T directory , bool recursive = false ) where T : DirectoryEntityInfo , new ()
+        {
+            DirectoryEntityInfo dir = new DirectoryEntityInfo ( directory.DirectoryPath );
+            Delete ( dir , recursive );
+        }
+
+        /// <summary>
+        /// 複数のディレクトリを削除する
+        /// </summary>
+        /// <param name="directories">削除するディレクトリ情報のコレクション</param>
+        /// <param name="recursive">サブディレクトリも再帰的に削除するかどうか</param>
+        public static void DeleteDirectories ( IEnumerable<DirectoryEntityInfo> directories , bool recursive = false )
+        {
+            foreach ( DirectoryEntityInfo directory in directories )
+            {
+                Delete ( directory , recursive );
+            }
+        }
+
+        /// <summary>
+        /// 複数のディレクトリを削除する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">ディレクトリ情報の型</typeparam>
+        /// <param name="directories">削除するディレクトリ情報のコレクション</param>
+        /// <param name="recursive">サブディレクトリも再帰的に削除するかどうか</param>
+        public static void DeleteDirectories<T> ( IEnumerable<T> directories , bool recursive = false ) where T : DirectoryEntityInfo , new ()
+        {
+            foreach ( T directory in directories )
+            {
+                Delete ( directory , recursive );
+            }
         }
         #endregion
     }
