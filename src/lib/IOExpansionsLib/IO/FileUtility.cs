@@ -23,6 +23,19 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path ) where T : FileEntityInfo , new ()
+        {
+            return Directory
+                .GetFiles ( path , "*" , SearchOption.TopDirectoryOnly )
+                .Select ( file => new T { FilePath = file } );
+        }
+
+        /// <summary>
         /// ファイルを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -31,6 +44,19 @@ namespace IOExpansionsLib.IO
         public static IEnumerable<FileEntityInfo> GetFiles ( string path , SortOrderPattern sortPattern = SortOrderPattern.None )
         {
             IEnumerable<FileEntityInfo> files = GetFiles ( path );
+            return SortFiles ( files , sortPattern );
+        }
+
+        /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : FileEntityInfo , new ()
+        {
+            IEnumerable<T> files = GetFiles<T> ( path );
             return SortFiles ( files , sortPattern );
         }
 
@@ -48,6 +74,20 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , string searchPattern ) where T : FileEntityInfo , new ()
+        {
+            return Directory
+                .GetFiles ( path , NormalizeSearchPattern ( searchPattern ) , SearchOption.TopDirectoryOnly )
+                .Select ( file => new T { FilePath = file } );
+        }
+
+        /// <summary>
         /// ファイルを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -57,6 +97,20 @@ namespace IOExpansionsLib.IO
         public static IEnumerable<FileEntityInfo> GetFiles ( string path , string searchPattern , SortOrderPattern sortPattern = SortOrderPattern.None )
         {
             IEnumerable<FileEntityInfo> files = GetFiles ( path , searchPattern );
+            return SortFiles ( files , sortPattern );
+        }
+
+        /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , string searchPattern , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : FileEntityInfo , new ()
+        {
+            IEnumerable<T> files = GetFiles<T> ( path , searchPattern );
             return SortFiles ( files , sortPattern );
         }
 
@@ -74,6 +128,20 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , SearchOption searchOption ) where T : FileEntityInfo , new ()
+        {
+            return Directory
+                .GetFiles ( path , "*" , searchOption )
+                .Select ( file => new T { FilePath = file } );
+        }
+
+        /// <summary>
         /// ファイルを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -83,6 +151,20 @@ namespace IOExpansionsLib.IO
         public static IEnumerable<FileEntityInfo> GetFiles ( string path , SearchOption searchOption , SortOrderPattern sortPattern = SortOrderPattern.None )
         {
             IEnumerable<FileEntityInfo> files = GetFiles ( path , searchOption );
+            return SortFiles ( files , sortPattern );
+        }
+
+        /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , SearchOption searchOption , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : FileEntityInfo , new ()
+        {
+            IEnumerable<T> files = GetFiles<T> ( path , searchOption );
             return SortFiles ( files , sortPattern );
         }
 
@@ -101,6 +183,21 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , string searchPattern , SearchOption searchOption ) where T : FileEntityInfo , new ()
+        {
+            return Directory
+                .GetFiles ( path , NormalizeSearchPattern ( searchPattern ) , searchOption )
+                .Select ( file => new T { FilePath = file } );
+        }
+
+        /// <summary>
         /// ファイルを取得する
         /// </summary>
         /// <param name="path">検索するディレクトリのパス</param>
@@ -115,12 +212,27 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルを取得する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">取得するファイルエンティティの型</typeparam>
+        /// <param name="path">検索するディレクトリのパス</param>
+        /// <param name="searchPattern">検索パターン</param>
+        /// <param name="searchOption">検索オプション</param>
+        /// <param name="sortPattern">並び替えパターン</param>
+        /// <returns>ファイルのコレクション</returns>
+        public static IEnumerable<T> GetFiles<T> ( string path , string searchPattern , SearchOption searchOption , SortOrderPattern sortPattern = SortOrderPattern.None ) where T : FileEntityInfo , new ()
+        {
+            IEnumerable<T> files = GetFiles<T> ( path , searchPattern , searchOption );
+            return SortFiles ( files , sortPattern );
+        }
+
+        /// <summary>
         /// ファイルコレクションを並び替える
         /// </summary>
         /// <param name="files">ファイルのコレクション</param>
         /// <param name="sortPattern">並び替えパターン</param>
         /// <returns>並び替え後のファイルコレクション</returns>
-        private static IEnumerable<FileEntityInfo> SortFiles ( IEnumerable<FileEntityInfo> files , SortOrderPattern sortPattern )
+        private static IEnumerable<T> SortFiles<T> ( IEnumerable<T> files , SortOrderPattern sortPattern ) where T : FileEntityInfo , new ()
         {
             return sortPattern switch
             {
@@ -176,6 +288,19 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルを移動する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">移動するファイルエンティティの型</typeparam>
+        /// <param name="sourceFile">移動するファイルの情報</param>
+        /// <param name="destinationPath">移動先のディレクトリパス</param>
+        /// <param name="isOverwrite">既存のファイルを上書きするかどうか</param>
+        public static void Move<T> ( T sourceFile , string destinationPath , bool isOverwrite = false ) where T : FileEntityInfo , new ()
+        {
+            FileEntityInfo fileEntityInfo = new FileEntityInfo ( sourceFile.FilePath );
+            Move ( fileEntityInfo , destinationPath , isOverwrite );
+        }
+
+        /// <summary>
         /// ファイルを移動する（既存のファイルが存在する場合はタイムスタンプを付加して移動）
         /// </summary>
         /// <param name="sourceFile">移動するファイルの情報</param>
@@ -214,6 +339,18 @@ namespace IOExpansionsLib.IO
             string newDestinationFilePath = Path.Combine ( destinationPath , newFileName );
 
             File.Move ( sourceFile.FilePath , newDestinationFilePath );
+        }
+
+        /// <summary>
+        /// ファイルを移動する（既存のファイルが存在する場合はタイムスタンプを付加して移動、ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">移動するファイルエンティティの型</typeparam>
+        /// <param name="sourceFile">移動するファイルの情報</param>
+        /// <param name="destinationPath">移動先のディレクトリパス</param>
+        public static void MoveWithTimestampIfExists<T> ( T sourceFile , string destinationPath ) where T : FileEntityInfo , new ()
+        {
+            FileEntityInfo fileEntityInfo = new FileEntityInfo ( sourceFile.FilePath );
+            MoveWithTimestampIfExists ( fileEntityInfo , destinationPath );
         }
         #endregion
 
@@ -256,6 +393,19 @@ namespace IOExpansionsLib.IO
         }
 
         /// <summary>
+        /// ファイルをコピーする（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">コピーするファイルエンティティの型</typeparam>
+        /// <param name="sourceFile">コピーするファイルの情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        /// <param name="isOverwrite">既存のファイルを上書きするかどうか</param>
+        public static void Copy<T> ( T sourceFile , string destinationPath , bool isOverwrite = false ) where T : FileEntityInfo , new ()
+        {
+            FileEntityInfo fileEntityInfo = new FileEntityInfo ( sourceFile.FilePath );
+            Copy ( fileEntityInfo , destinationPath , isOverwrite );
+        }
+
+        /// <summary>
         /// ファイルをコピーする（既存のファイルが存在する場合はタイムスタンプを付加してコピー）
         /// </summary>
         /// <param name="sourceFile">コピーするファイルの情報</param>
@@ -294,6 +444,18 @@ namespace IOExpansionsLib.IO
             string newDestinationFilePath = Path.Combine ( destinationPath , newFileName );
             File.Copy ( sourceFile.FilePath , newDestinationFilePath );
         }
+
+        /// <summary>
+        /// ファイルをコピーする（既存のファイルが存在する場合はタイムスタンプを付加してコピー、ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">コピーするファイルエンティティの型</typeparam>
+        /// <param name="sourceFile">コピーするファイルの情報</param>
+        /// <param name="destinationPath">コピー先のディレクトリパス</param>
+        public static void CopyWithTimestampIfExists<T> ( T sourceFile , string destinationPath ) where T : FileEntityInfo , new ()
+        {
+            FileEntityInfo fileEntityInfo = new FileEntityInfo ( sourceFile.FilePath );
+            CopyWithTimestampIfExists ( fileEntityInfo , destinationPath );
+        }
         #endregion
 
         #region ファイル削除
@@ -310,6 +472,46 @@ namespace IOExpansionsLib.IO
             }
 
             File.Delete ( file.FilePath );
+        }
+
+        /// <summary>
+        /// ファイルを削除する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">削除するファイルエンティティの型</typeparam>
+        /// <param name="file">削除するファイルの情報</param>
+        /// <exception cref="FileNotFoundException">指定されたファイルが存在しない場合にスローされます。</exception>
+        public static void Delete<T> ( T file ) where T : FileEntityInfo , new ()
+        {
+            if ( !File.Exists ( file.FilePath ) )
+            {
+                throw new FileNotFoundException ( $"File '{file.FilePath}' does not exist." );
+            }
+            File.Delete ( file.FilePath );
+        }
+
+        /// <summary>
+        /// 複数のファイルを削除する
+        /// </summary>
+        /// <param name="files">削除するファイルの情報のコレクション</param>
+        public static void DeleteFiles ( IEnumerable<FileEntityInfo> files )
+        {
+            foreach ( FileEntityInfo file in files )
+            {
+                Delete ( file );
+            }
+        }
+
+        /// <summary>
+        /// 複数のファイルを削除する（ジェネリック版）
+        /// </summary>
+        /// <typeparam name="T">削除するファイルエンティティの型</typeparam>
+        /// <param name="files">削除するファイルの情報のコレクション</param>
+        public static void DeleteFiles<T> ( IEnumerable<T> files ) where T : FileEntityInfo , new ()
+        {
+            foreach ( T file in files )
+            {
+                Delete ( file );
+            }
         }
         #endregion
     }
