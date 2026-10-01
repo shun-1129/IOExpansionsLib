@@ -1,0 +1,55 @@
+name: Create Tag Release
+
+on:
+    push:
+        branches:
+            - "master"
+
+permissions:
+    contents: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Get Version
+              shell: bash
+              run: |
+                  VERSION=$(cat .version | tr -d '[:space:]')
+                  echo VERSION=$VERSION > ${GITHUB_ENV}
+                  echo "TAG_NAME=Ver.$VERSION" >> ${GITHUB_ENV}
+
+            - name: Check Tag Name
+              shell: bash
+              run: |
+                  if git rev-parse "refs/tags/${{ env.TAG_NAME }}" >/dev/null 2>&1; then
+                      echo "Tag ${{ env.TAG_NAME }} already exists."
+                      exit 1
+                  fi
+
+            - name: Restore dependencies
+              run: dotnet restore
+
+            - name: Build
+              run: |
+                  dotnet build \
+                  --no-restore \
+                  --configuration Release
+
+            # - name: Publish
+            #   run: |
+            #       dotnet publish \
+            #       src/lib/IOExpansionsLib/IOExpansionsLib.csproj \
+            #       --configuration Release \
+            #       --no-restore \
+            #       --output ./publish \
+            #       -p:Version=${{ env.VERSION }} \
+            #       -p:FileVersion=${{ env.VERSION }}
