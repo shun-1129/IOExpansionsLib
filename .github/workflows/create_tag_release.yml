@@ -79,9 +79,18 @@ jobs:
             # --------------------------------
             - name: Create ZIP
               run: |
+                  cd publish
                   zip -r \
-                      ../IOExpansionsLib_${{ env.VERSION }}.zip \
+                      "../IOExpansionsLib_${{ env.VERSION }}.zip" \
                       .
+
+            # --------------------------------
+            # ZIP確認
+            # --------------------------------
+            - name: Check ZIP
+              run: |
+                  ls -lh
+                  test -f "IOExpansionsLib_${{ env.VERSION }}.zip"
 
             # -------------------------
             # git 設定
@@ -109,4 +118,4 @@ jobs:
                   name: Release ${{ env.VERSION }}
                   generate_release_notes: true
                   files: |
-                      IOExpansionsLib_${{ env.VERSION }}.zip
+                      ./IOExpansionsLib_${{ env.VERSION }}.zip
