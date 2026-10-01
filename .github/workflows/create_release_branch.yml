@@ -30,6 +30,11 @@ jobs:
               run: |
                   echo ${{ github.event.inputs.version }} > .version
 
+            - name: Configure Git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
             - name: Create Release Branch
               shell: bash
               run: |
