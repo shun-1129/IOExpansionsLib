@@ -12,14 +12,25 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
+            # --------------------------------
+            # コードのチェックアウト
+            # --------------------------------
             - name: Checkout repository
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
+            # --------------------------------
+            # .NETのセットアップ
+            # --------------------------------
             - name: Set up .NET
               uses: actions/setup-dotnet@v4
               with:
                   dotnet-version: "8.0.x"
 
+            # --------------------------------
+            # バージョンの確認
+            # --------------------------------
             - name: Get Version
               shell: bash
               run: |
@@ -27,6 +38,9 @@ jobs:
                   echo VERSION=$VERSION > ${GITHUB_ENV}
                   echo "TAG_NAME=Ver.$VERSION" >> ${GITHUB_ENV}
 
+            # --------------------------------
+            # タグ名の確認
+            # --------------------------------
             - name: Check Tag Name
               shell: bash
               run: |
@@ -35,6 +49,9 @@ jobs:
                       exit 1
                   fi
 
+            # --------------------------------
+            # レストア
+            # --------------------------------
             - name: Restore dependencies
               run: dotnet restore
 
@@ -44,12 +61,31 @@ jobs:
                   --no-restore \
                   --configuration Release
 
-            # - name: Publish
-            #   run: |
-            #       dotnet publish \
-            #       src/lib/IOExpansionsLib/IOExpansionsLib.csproj \
-            #       --configuration Release \
-            #       --no-restore \
-            #       --output ./publish \
-            #       -p:Version=${{ env.VERSION }} \
-            #       -p:FileVersion=${{ env.VERSION }}
+            # -------------------------
+            # 発行
+            # -------------------------
+            - name: Publish
+              run: |
+                  dotnet publish \
+                  src/lib/IOExpansionsLib/IOExpansionsLib.csproj \
+                  --configuration Release \
+                  --no-restore \
+                  --output ./publish \
+                  -p:Version=${{ env.VERSION }} \
+                  -p:FileVersion=${{ env.VERSION }}
+
+            # -------------------------
+            # git 設定
+            # -------------------------
+            - name: Configure Git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            # -------------------------
+            # タグ作成
+            # -------------------------
+            - name: Create Tag
+              run: |
+                  git tag -a "${{ env.TAG_NAME }}" -m "Release ${{ env.VERSION }}"
+                  git push origin "${{ env.TAG_NAME }}"
