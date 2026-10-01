@@ -1,0 +1,44 @@
+name: Create Release Branch
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "作成するリリースブランチのバージョンを指定してください"
+                required: true
+                default: "1.0.0"
+
+jobs:
+    create_release_branch:
+        runs-on: ubuntu-latest
+        env:
+            RELEASE_BRANCH_NAME: release/${{ github.event.inputs.version }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Check Release Branch Name
+              run: |
+                  echo "Release branch name: ${{ env.RELEASE_BRANCH_NAME }}"
+                  if git ls-remote --heads origin "${{ env.RELEASE_BRANCH_NAME }}" | grep -q "${{ env.RELEASE_BRANCH_NAME }}"; then
+                      echo "Release branch already exists."
+                      exit 1
+                  fi
+
+            - name: Update Version File
+              run: |
+                  echo ${{ github.event.inputs.version }} > .version
+
+            - name: Create Release Branch
+              shell: bash
+              run: |
+                  BRANCH_NAME="${{ env.RELEASE_BRANCH_NAME }}"
+                  git checkout -b "$BRANCH_NAME"
+                  git push origin "$BRANCH_NAME"
+
+            - name: Commit Version File
+              run: |
+                  git add .version
+                  git commit -m "[Update Bot] version to ${{ github.event.inputs.version }}"
+                  git push origin "${{ env.RELEASE_BRANCH_NAME }}"
